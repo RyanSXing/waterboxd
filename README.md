@@ -6,6 +6,50 @@ A social water rating and review platform built with Next.js, MongoDB, and TypeS
 
 Waterboxd is a community-driven platform where users can rate, review, and discover different water brands and types. Track your water ratings, create and share lists, maintain a wantlist, and follow other water enthusiasts.
 
+## Inspiration
+
+i recently saw a reel about someone making letterboxed for chinese ciggarettes and i thought "that is so performative — how didn’t i think of that?" When I heard the hackathon theme was water, I remembered visiting Erewhon and seeing all the fancy overpriced water bottles full of buzzwords like "hydrogen infused" and "alkaline." What is that even supposed to mean? That moment sparked the idea for Waterboxd: basically Letterboxd for bottled water.
+
+## What it does
+
+Waterboxd is a platform for browsing a curated gallery of bottled waters — mineral, spring, alkaline, purified, sparkling, and more. The current demo gallery contains about 20 waters to demonstrate core functionality. Users can:
+
+- browse water entries and see their properties
+- rate and review waters they've tried
+- view friends' and strangers' ratings
+- curate and share custom water lists
+- keep a wantlist of waters they want to try
+
+## How we built it
+
+We built Waterboxd with Next.js, React, TypeScript, Tailwind CSS, NextAuth.js, and MongoDB. The site uses the Next.js app router and API routes for server-side data operations, while the landing page features a custom WebGL ripple shader effect for a watery hero experience.
+
+## Challenges we ran into
+
+We spent a lot of time figuring out how to make the landing page ripple effect work correctly in WebGL, especially with frame buffers, floating-point textures, and mouse interaction. We also had to get comfortable with MongoDB schema design, NextAuth session handling, and integrating all of that in a single full-stack app.
+
+## Accomplishments we're proud of
+
+- Building the animated water ripple landing page
+- Shipping a fully functional social rating website
+- Enabling multiple users to sign in, rate waters, and interact
+- Supporting curated lists, wantlists, and review history
+
+## What we learned
+
+- WebGL can create compelling UI experiences inside a React app
+- Next.js app router is powerful for building full-stack apps
+- MongoDB is flexible for user and review data, but needs careful schema planning
+- Strong UX makes a social discovery app feel more fun and easy to use
+
+## What's next for Waterboxd
+
+- Add more water brands, filters, and sorting options
+- Improve mobile performance and layout
+- Enable public profiles and shareable lists
+- Add water recommendations and tasting challenges
+- Expand the water catalog with more real-world bottles
+
 ## Features
 
 - 🌊 **Rate & Review Waters** - Share your thoughts on different water brands with detailed ratings and reviews

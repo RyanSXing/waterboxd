@@ -42,8 +42,8 @@ void main() {
   // Emit ripple at cursor
   if (u_mouse.z > 0.0) {
     float dist = distance(gl_FragCoord.xy, u_mouse.xy);
-    if (dist <= 25.0) {
-      fragColor.x += (1.0 - dist / 25.0) * 0.2;
+    if (dist <= 40.0) {
+      fragColor.x += (1.0 - dist / 40.0) * 0.8;
     }
   }
 }
@@ -61,7 +61,7 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   vec4 data = texture(u_sim, uv);
 
-  vec2 distUV = clamp(uv + 0.04 * data.zw, 0.0, 1.0);
+  vec2 distUV = clamp(uv + 0.16 * data.zw, 0.0, 1.0);
 
   // Background uses undistorted uv.y so colour never shifts under cursor
   vec3 colShallow = vec3(0.55, 0.90, 0.98);
