@@ -42,8 +42,8 @@ void main() {
   // Emit ripple at cursor
   if (u_mouse.z > 0.0) {
     float dist = distance(gl_FragCoord.xy, u_mouse.xy);
-    if (dist <= 35.0) {
-      fragColor.x += (1.0 - dist / 35.0) * 0.6;
+    if (dist <= 25.0) {
+      fragColor.x += (1.0 - dist / 25.0) * 0.2;
     }
   }
 }
@@ -61,7 +61,7 @@ void main() {
   vec4 data = texture(u_sim, uv);
 
   // Moderate distortion
-  vec2 offset = 0.10 * data.zw;
+  vec2 offset = 0.04 * data.zw;
   vec2 distUV = clamp(uv + offset, 0.0, 1.0);
 
   // Bright tropical water gradient — no pressure term so cursor leaves no colour artifact
@@ -306,10 +306,10 @@ export default function LandingWater() {
       />
       {/* ENTER button sits below the centered text — HTML so it's clickable */}
       <div
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute bottom-0 left-0 right-0 flex justify-center pb-16"
         style={{ pointerEvents: 'none' }}
       >
-        <div style={{ marginTop: '26vh', pointerEvents: 'auto' }}>
+        <div style={{ pointerEvents: 'auto' }}>
           <Link
             href="/home"
             className="inline-block bg-[#e63946] text-white font-black tracking-widest uppercase px-12 py-4 text-sm hover:bg-white hover:text-black transition-colors"
