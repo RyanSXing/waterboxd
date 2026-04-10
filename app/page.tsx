@@ -3,7 +3,8 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-const BottleScene = dynamic(() => import('@/components/BottleScene'), { ssr: false })
+const BottleScene  = dynamic(() => import('@/components/BottleScene'),  { ssr: false })
+const WaterShader  = dynamic(() => import('@/components/WaterShader'),  { ssr: false })
 
 export default function LandingPage() {
   const [visible, setVisible] = useState(false)
@@ -14,22 +15,9 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden flex flex-col items-center justify-center">
+    <div className="fixed inset-0 overflow-hidden flex flex-col items-center justify-center">
 
       <style>{`
-        @keyframes rise {
-          0%   { transform: translateY(0) scale(0.5); opacity: 0; }
-          15%  { opacity: 0.6; }
-          100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
-        }
-        .bubble {
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(79,195,247,0.15);
-          border: 1px solid rgba(79,195,247,0.3);
-          animation: rise linear infinite;
-          pointer-events: none;
-        }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -39,21 +27,10 @@ export default function LandingPage() {
         .fade-up-delay2 { animation: fadeUp 0.9s 0.5s ease forwards; opacity: 0; }
       `}</style>
 
-      {/* Rising bubbles */}
-      {[...Array(18)].map((_, i) => (
-        <span
-          key={i}
-          className="bubble"
-          style={{
-            width:  `${8 + (i * 7) % 22}px`,
-            height: `${8 + (i * 7) % 22}px`,
-            left:   `${(i * 17 + 5) % 95}%`,
-            bottom: '-40px',
-            animationDuration: `${5 + (i * 3) % 7}s`,
-            animationDelay:    `${(i * 1.1) % 6}s`,
-          }}
-        />
-      ))}
+      {/* Water ripple shader — fullscreen background */}
+      <div className="absolute inset-0" style={{ zIndex: 0 }}>
+        <WaterShader />
+      </div>
 
       {/* 3D bottle */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
