@@ -1,25 +1,49 @@
 'use client'
-import { Suspense, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 
 useGLTF.setDecoderPath('/draco/')
 
-function Bottle() {
-  const { scene } = useGLTF('/water_bottle.glb')
-  const ref = useRef<THREE.Group>(null)
+// Shared mouse state — updated on window, read in useFrame
+const mouse = { x: 0, y: 0 }
 
-  useFrame((state) => {
+function Bottle() {
+  const { scene } = useGLTF('/plastic_water_bottle.glb')
+  const ref = useRef<THREE.Group>(null)
+  // Target rotation for smooth lerp
+  const target = useRef({ x: 0, y: 0 })
+
+  useFrame(() => {
     if (!ref.current) return
-    ref.current.rotation.y = state.clock.elapsedTime * 0.4
-    ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.08
+
+    // Map mouse [-1,1] to rotation range
+    target.current.y = mouse.x * Math.PI      // full left/right rotation
+    target.current.x = mouse.y * 0.4          // tilt up/down (limited)
+
+    // Smooth lerp toward target
+    ref.current.rotation.y += (target.current.y - ref.current.rotation.y) * 0.08
+    ref.current.rotation.x += (target.current.x - ref.current.rotation.x) * 0.08
+
+    // Gentle float animation
+    ref.current.position.y = Math.sin(Date.now() * 0.001) * 0.08 - 0.5
   })
 
   return <primitive ref={ref} object={scene} scale={2.2} position={[0, -0.5, 0]} />
 }
 
 export default function BottleScene() {
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      // Normalize to [-1, 1]
+      mouse.x = (e.clientX / window.innerWidth)  * 2 - 1
+      mouse.y = (e.clientY / window.innerHeight) * 2 - 1
+    }
+    window.addEventListener('mousemove', onMouseMove)
+    return () => window.removeEventListener('mousemove', onMouseMove)
+  }, [])
+
   return (
     <Canvas
       camera={{ position: [0, 0.5, 3.5], fov: 45 }}
@@ -37,4 +61,4 @@ export default function BottleScene() {
   )
 }
 
-useGLTF.preload('/water_bottle.glb')
+useGLTF.preload('/plastic_water_bottle.glb')

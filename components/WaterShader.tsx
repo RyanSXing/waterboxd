@@ -47,10 +47,11 @@ void main() {
 
   fragColor = vec4(pressure, pVel, (p_right - p_left) / 2.0, (p_up - p_down) / 2.0);
 
+  // Always emit ripples at mouse position (no click required)
   if (u_mouse.z > 0.0) {
     float dist = distance(gl_FragCoord.xy, u_mouse.xy);
     if (dist <= 20.0) {
-      fragColor.x += 1.0 - dist / 20.0;
+      fragColor.x += (1.0 - dist / 20.0) * 0.4;
     }
   }
 }
@@ -222,9 +223,8 @@ export default function WaterShader() {
       mouse.y = h - (clientY - rect.top) * (h / rect.height) // flip Y for WebGL
     }
 
-    function onMouseMove(e: MouseEvent)  { getPos(e.clientX, e.clientY) }
-    function onMouseDown(e: MouseEvent)  { mouse.down = true; getPos(e.clientX, e.clientY) }
-    function onMouseUp()                 { mouse.down = false }
+    function onMouseMove(e: MouseEvent)  { getPos(e.clientX, e.clientY); mouse.down = true }
+    function onMouseLeave()              { mouse.down = false }
     function onTouchMove(e: TouchEvent)  {
       e.preventDefault()
       const t = e.touches[0]
@@ -236,8 +236,7 @@ export default function WaterShader() {
     function onResize() { allocate(window.innerWidth, window.innerHeight) }
 
     window.addEventListener('mousemove',  onMouseMove)
-    window.addEventListener('mousedown',  onMouseDown)
-    window.addEventListener('mouseup',    onMouseUp)
+    window.addEventListener('mouseleave', onMouseLeave)
     canvas.addEventListener('touchmove',  onTouchMove, { passive: false })
     canvas.addEventListener('touchend',   onTouchEnd)
     window.addEventListener('resize',     onResize)
@@ -248,8 +247,7 @@ export default function WaterShader() {
     return () => {
       cancelAnimationFrame(animId)
       window.removeEventListener('mousemove',  onMouseMove)
-      window.removeEventListener('mousedown',  onMouseDown)
-      window.removeEventListener('mouseup',    onMouseUp)
+      window.removeEventListener('mouseleave', onMouseLeave)
       canvas.removeEventListener('touchmove',  onTouchMove)
       canvas.removeEventListener('touchend',   onTouchEnd)
       window.removeEventListener('resize',     onResize)
