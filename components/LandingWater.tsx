@@ -55,30 +55,33 @@ precision highp float;
 uniform sampler2D u_sim;
 uniform sampler2D u_text;
 uniform vec2 u_res;
+uniform vec2 u_mouse_norm;  // [-1,1] normalized mouse, x only used for rotation
 out vec4 fragColor;
 void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   vec4 data = texture(u_sim, uv);
 
-  // Moderate distortion
-  vec2 offset = 0.04 * data.zw;
-  vec2 distUV = clamp(uv + offset, 0.0, 1.0);
+  vec2 distUV = clamp(uv + 0.04 * data.zw, 0.0, 1.0);
 
-  // Bright tropical water gradient — no pressure term so cursor leaves no colour artifact
+  // Background uses undistorted uv.y so colour never shifts under cursor
   vec3 colShallow = vec3(0.55, 0.90, 0.98);
   vec3 colDeep    = vec3(0.08, 0.68, 0.88);
-  vec3 bg = mix(colDeep, colShallow, distUV.y);
+  vec3 bg = mix(colDeep, colShallow, uv.y);
 
-  // White sun sparkles
+  // Sun sparkles
   vec3 norm     = normalize(vec3(-data.z, 0.5, -data.w));
   vec3 lightDir = normalize(vec3(-2.0, 8.0, 4.0));
   float spec    = pow(max(0.0, dot(norm, lightDir)), 35.0);
   bg += vec3(1.0) * spec * 2.0;
 
-  // Text sampled at the same distorted UV (y-flipped; canvas 2D has y=0 at top)
-  vec4 txt = texture(u_text, vec2(distUV.x, 1.0 - distUV.y));
-  vec3 color = mix(bg, txt.rgb, txt.a * 0.94);
+  // Text UV: apply wave distortion then a subtle mouse-driven rotation
+  float angle = u_mouse_norm.x * 0.06;  // ±~3.4 degrees
+  float cosA = cos(angle), sinA = sin(angle);
+  vec2 tc = vec2(distUV.x, 1.0 - distUV.y) - 0.5;
+  tc = vec2(cosA * tc.x - sinA * tc.y, sinA * tc.x + cosA * tc.y) + 0.5;
+  vec4 txt = texture(u_text, tc);
 
+  vec3 color = mix(bg, txt.rgb, txt.a * 0.94);
   fragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }
 `
@@ -197,9 +200,10 @@ export default function LandingWater() {
       frame: gl.getUniformLocation(simProg, 'u_frame'),
     }
     const renU = {
-      sim:  gl.getUniformLocation(renderProg, 'u_sim'),
-      text: gl.getUniformLocation(renderProg, 'u_text'),
-      res:  gl.getUniformLocation(renderProg, 'u_res'),
+      sim:       gl.getUniformLocation(renderProg, 'u_sim'),
+      text:      gl.getUniformLocation(renderProg, 'u_text'),
+      res:       gl.getUniformLocation(renderProg, 'u_res'),
+      mouseNorm: gl.getUniformLocation(renderProg, 'u_mouse_norm'),
     }
 
     function uploadText() {
@@ -255,6 +259,7 @@ export default function LandingWater() {
       gl.bindTexture(gl.TEXTURE_2D, textTex)
       gl.uniform1i(renU.text, 1)
       gl.uniform2f(renU.res, w, h)
+      gl.uniform2f(renU.mouseNorm, mouse.x / w * 2 - 1, mouse.y / h * 2 - 1)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
       frame++
