@@ -9,6 +9,11 @@ const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 export const metadata: Metadata = {
   title: 'Waterboxd',
   description: 'Track. Rate. Hydrate.',
+  icons: {
+    icon: '/logo.webp',
+    apple: '/logo.webp',
+    shortcut: '/logo.webp',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

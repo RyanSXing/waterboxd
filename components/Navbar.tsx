@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 
 export default function Navbar() {
@@ -8,8 +9,9 @@ export default function Navbar() {
   return (
     <nav className="bg-black text-white border-b-3 border-[#e63946] sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <Link href="/home" className="font-black text-lg tracking-[6px] text-white hover:text-[#e63946] transition-colors">
-          WATERBOXD
+        <Link href="/home" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Image src="/logo.webp" alt="Waterboxd" width={32} height={32} className="object-contain" />
+          <span className="font-black text-lg tracking-[6px] text-white">WATERBOXD</span>
         </Link>
         <div className="flex items-center gap-6 text-xs font-black tracking-widest">
           <Link href="/waters" className="text-gray-300 hover:text-white transition-colors">WATERS</Link>
