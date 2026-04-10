@@ -6,37 +6,28 @@ import * as THREE from 'three'
 
 useGLTF.setDecoderPath('/draco/')
 
-// Shared mouse state — updated on window, read in useFrame
 const mouse = { x: 0, y: 0 }
 
 function Bottle() {
   const { scene } = useGLTF('/plastic_water_bottle.glb')
   const ref = useRef<THREE.Group>(null)
-  // Target rotation for smooth lerp
   const target = useRef({ x: 0, y: 0 })
 
   useFrame(() => {
     if (!ref.current) return
-
-    // Map mouse [-1,1] to rotation range
-    target.current.y = mouse.x * Math.PI      // full left/right rotation
-    target.current.x = mouse.y * 0.4          // tilt up/down (limited)
-
-    // Smooth lerp toward target
+    target.current.y = mouse.x * Math.PI
+    target.current.x = mouse.y * 0.4
     ref.current.rotation.y += (target.current.y - ref.current.rotation.y) * 0.08
     ref.current.rotation.x += (target.current.x - ref.current.rotation.x) * 0.08
-
-    // Gentle float animation
-    ref.current.position.y = Math.sin(Date.now() * 0.001) * 0.08 - 0.5
+    ref.current.position.y = Math.sin(Date.now() * 0.001) * 0.08
   })
 
-  return <primitive ref={ref} object={scene} scale={2.2} position={[0, -0.5, 0]} />
+  return <primitive ref={ref} object={scene} scale={0.5} position={[0, 0, 0]} />
 }
 
 export default function BottleScene() {
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
-      // Normalize to [-1, 1]
       mouse.x = (e.clientX / window.innerWidth)  * 2 - 1
       mouse.y = (e.clientY / window.innerHeight) * 2 - 1
     }
@@ -46,16 +37,16 @@ export default function BottleScene() {
 
   return (
     <Canvas
-      camera={{ position: [0, 0.5, 3.5], fov: 45 }}
+      camera={{ position: [0, 0, 5], fov: 50 }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={1.2} />
-      <directionalLight position={[5, 5, 5]} intensity={2} />
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[5, 5, 5]} intensity={2.5} />
       <directionalLight position={[-5, 2, -5]} intensity={1} color="#4fc3f7" />
       <pointLight position={[0, 3, 2]} intensity={1.5} />
       <Suspense fallback={null}>
         <Bottle />
-        <ContactShadows position={[0, -1.4, 0]} opacity={0.3} scale={5} blur={2} />
+        <ContactShadows position={[0, -1.8, 0]} opacity={0.2} scale={3} blur={2} />
       </Suspense>
     </Canvas>
   )

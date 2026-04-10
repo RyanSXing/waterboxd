@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-const BottleScene  = dynamic(() => import('@/components/BottleScene'),  { ssr: false })
-const WaterShader  = dynamic(() => import('@/components/WaterShader'),  { ssr: false })
+const BottleScene = dynamic(() => import('@/components/BottleScene'), { ssr: false })
+const WaterShader = dynamic(() => import('@/components/WaterShader'), { ssr: false })
 
 export default function LandingPage() {
   const [visible, setVisible] = useState(false)
@@ -46,18 +46,20 @@ export default function LandingPage() {
       >
         {visible && (
           <>
-            <div className="fade-up text-[#e63946] text-xs font-black tracking-[5px] mb-3">
+            <div className="fade-up text-[#e63946] text-xs font-black tracking-[5px] mb-3"
+              style={{ textShadow: '0 1px 3px rgba(255,255,255,0.6)' }}>
               TRACK. RATE. HYDRATE.
             </div>
             <h1
-              className="fade-up-delay text-white font-black tracking-[4px] leading-none mb-8"
-              style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)' }}
+              className="fade-up-delay text-black font-black tracking-[4px] leading-none mb-8"
+              style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', textShadow: '0 2px 8px rgba(255,255,255,0.5)' }}
             >
               WATERBOXD
             </h1>
             <Link
               href="/home"
               className="fade-up-delay2 inline-block bg-[#e63946] text-white font-black tracking-widest uppercase px-10 py-3 border-3 border-white hover:bg-white hover:text-black transition-colors text-sm"
+              style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}
             >
               ENTER →
             </Link>

@@ -57,7 +57,7 @@ void main() {
 }
 `
 
-// Image pass: render wave as dark water with light reflections
+// Image pass: bright tropical water
 const RENDER_FRAG = `#version 300 es
 precision highp float;
 uniform sampler2D u_sim;
@@ -68,23 +68,27 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   vec4 data = texture(u_sim, uv);
 
-  vec3 color = vec3(0.0);
+  // Distort UV by wave gradient for refraction effect
+  vec2 distUV = clamp(uv + 0.04 * data.zw, 0.0, 1.0);
 
-  vec3 normal   = normalize(vec3(-data.z, 0.5, -data.w));
-  vec3 lightDir = normalize(vec3(-3.0, 10.0, 3.0));
+  // Bright tropical water gradient: sky-blue top, cyan bottom
+  vec3 colA = vec3(0.53, 0.88, 0.98); // light sky blue
+  vec3 colB = vec3(0.10, 0.72, 0.86); // vivid cyan
+  vec3 bg = mix(colB, colA, distUV.y + data.x * 0.08);
 
-  // Subtle diffuse water tint
+  // Surface normal from gradient
+  vec3 normal   = normalize(vec3(-data.z, 0.6, -data.w));
+  vec3 lightDir = normalize(vec3(-2.0, 8.0, 4.0));
+
+  // Diffuse shimmer
   float diff = max(0.0, dot(normal, lightDir));
-  color += vec3(0.0, 0.06, 0.15) * diff * 0.25;
+  bg += vec3(0.15, 0.25, 0.15) * diff * 0.3;
 
-  // Specular glint (blue-white, like light on water at night)
-  float spec = pow(max(0.0, dot(normal, lightDir)), 60.0);
-  color += vec3(0.35, 0.65, 1.0) * spec;
+  // Bright white sun sparkles
+  float spec = pow(max(0.0, dot(normal, lightDir)), 50.0);
+  bg += vec3(1.0, 1.0, 1.0) * spec * 1.2;
 
-  // Pressure glow
-  color += vec3(0.0, 0.04, 0.1) * max(0.0, data.x) * 0.4;
-
-  fragColor = vec4(color, 1.0);
+  fragColor = vec4(clamp(bg, 0.0, 1.0), 1.0);
 }
 `
 
