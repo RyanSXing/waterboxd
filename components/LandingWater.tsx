@@ -39,11 +39,11 @@ void main() {
   pVel *= 1.0 - 0.002 * delta;
   pressure *= 0.999;
   fragColor = vec4(pressure, pVel, (p_right - p_left) / 2.0, (p_up - p_down) / 2.0);
-  // Emit ripple at cursor — larger radius, stronger push
+  // Emit ripple at cursor
   if (u_mouse.z > 0.0) {
     float dist = distance(gl_FragCoord.xy, u_mouse.xy);
-    if (dist <= 60.0) {
-      fragColor.x += (1.0 - dist / 60.0) * 2.5;
+    if (dist <= 35.0) {
+      fragColor.x += (1.0 - dist / 35.0) * 0.6;
     }
   }
 }
@@ -60,14 +60,14 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   vec4 data = texture(u_sim, uv);
 
-  // Large visible distortion
-  vec2 offset = 0.22 * data.zw;
+  // Moderate distortion
+  vec2 offset = 0.10 * data.zw;
   vec2 distUV = clamp(uv + offset, 0.0, 1.0);
 
-  // Bright tropical water gradient
+  // Bright tropical water gradient — no pressure term so cursor leaves no colour artifact
   vec3 colShallow = vec3(0.55, 0.90, 0.98);
   vec3 colDeep    = vec3(0.08, 0.68, 0.88);
-  vec3 bg = mix(colDeep, colShallow, distUV.y + data.x * 0.12);
+  vec3 bg = mix(colDeep, colShallow, distUV.y);
 
   // White sun sparkles
   vec3 norm     = normalize(vec3(-data.z, 0.5, -data.w));
@@ -309,7 +309,7 @@ export default function LandingWater() {
         className="absolute inset-0 flex items-center justify-center"
         style={{ pointerEvents: 'none' }}
       >
-        <div style={{ marginTop: '14vh', pointerEvents: 'auto' }}>
+        <div style={{ marginTop: '26vh', pointerEvents: 'auto' }}>
           <Link
             href="/home"
             className="inline-block bg-[#e63946] text-white font-black tracking-widest uppercase px-12 py-4 text-sm hover:bg-white hover:text-black transition-colors"
