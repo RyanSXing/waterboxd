@@ -8,7 +8,7 @@ export default function Navbar() {
   return (
     <nav className="bg-black text-white border-b-3 border-[#e63946] sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <Link href="/" className="font-black text-lg tracking-[6px] text-white hover:text-[#e63946] transition-colors">
+        <Link href="/home" className="font-black text-lg tracking-[6px] text-white hover:text-[#e63946] transition-colors">
           WATERBOXD
         </Link>
         <div className="flex items-center gap-6 text-xs font-black tracking-widest">

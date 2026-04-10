@@ -1,106 +1,93 @@
+'use client'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import HeroBubbles from '@/components/HeroBubbles'
-import WaterCard from '@/components/WaterCard'
-import { connectDB } from '@/lib/db'
-import { Water } from '@/models/Water'
-import { Rating } from '@/models/Rating'
-import { starsDisplay } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
-async function getPopularWaters() {
-  await connectDB()
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-  const recent = await Rating.aggregate([
-    { $match: { createdAt: { $gte: sevenDaysAgo } } },
-    { $group: { _id: '$waterId', count: { $sum: 1 } } },
-    { $sort: { count: -1 } },
-    { $limit: 10 },
-  ])
-  if (recent.length > 0) {
-    const ids = recent.map(r => r._id)
-    return Water.find({ _id: { $in: ids } }).lean()
-  }
-  return Water.find().sort({ avgRating: -1 }).limit(10).lean()
-}
+const BottleScene = dynamic(() => import('@/components/BottleScene'), { ssr: false })
 
-async function getRecentReviews() {
-  await connectDB()
-  return Rating.find({ review: { $ne: '' } })
-    .sort({ createdAt: -1 })
-    .limit(5)
-    .populate('userId', 'username')
-    .populate('waterId', 'name brand slug')
-    .lean()
-}
+export default function LandingPage() {
+  const [visible, setVisible] = useState(false)
 
-export default async function HomePage() {
-  const [waters, reviews] = await Promise.all([getPopularWaters(), getRecentReviews()])
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 100)
+    return () => clearTimeout(t)
+  }, [])
 
   return (
-    <div>
-      {/* HERO */}
-      <section className="bg-black relative overflow-hidden min-h-[340px] flex items-center border-b-3 border-black">
-        <HeroBubbles />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-16">
-          <div className="text-[#e63946] text-xs font-black tracking-[4px] mb-3">TRACK. RATE. HYDRATE.</div>
-          <h1 className="text-white text-4xl md:text-6xl font-black tracking-widest leading-none mb-4">
-            THE SOCIAL NETWORK<br />FOR WATER DRINKERS.
-          </h1>
-          <p className="text-gray-400 text-sm mb-8 max-w-md">
-            Rate every bottle. Keep a hydration diary. Find your perfect water.
-          </p>
-          <Link href="/sign-up" className="btn-primary inline-block text-sm">
-            GET STARTED →
-          </Link>
-        </div>
-      </section>
+    <div className="fixed inset-0 bg-black overflow-hidden flex flex-col items-center justify-center">
 
-      {/* POPULAR THIS WEEK */}
-      <section className="max-w-6xl mx-auto px-4 py-12 border-b-3 border-black">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl tracking-widest">POPULAR THIS WEEK</h2>
-          <Link href="/waters" className="text-[#e63946] text-xs font-black tracking-widest hover:underline">
-            ALL WATERS →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {waters.map((w: any) => (
-            <WaterCard
-              key={w._id.toString()}
-              slug={w.slug}
-              name={w.name}
-              brand={w.brand}
-              image={w.image}
-              avgRating={w.avgRating}
-              ratingCount={w.ratingCount}
-            />
-          ))}
-        </div>
-      </section>
+      <style>{`
+        @keyframes rise {
+          0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+          15%  { opacity: 0.6; }
+          100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
+        }
+        .bubble {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(79,195,247,0.15);
+          border: 1px solid rgba(79,195,247,0.3);
+          animation: rise linear infinite;
+          pointer-events: none;
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up        { animation: fadeUp 0.9s ease forwards; }
+        .fade-up-delay  { animation: fadeUp 0.9s 0.25s ease forwards; opacity: 0; }
+        .fade-up-delay2 { animation: fadeUp 0.9s 0.5s ease forwards; opacity: 0; }
+      `}</style>
 
-      {/* RECENT REVIEWS */}
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-xl mb-6">RECENT REVIEWS</h2>
-        <div className="space-y-4">
-          {reviews.length === 0 && (
-            <p className="text-gray-400 text-sm">No reviews yet. Be the first!</p>
-          )}
-          {reviews.map((r: any) => (
-            <div key={r._id.toString()} className="border-l-3 border-[#e63946] pl-4">
-              <div className="text-sm">
-                <Link href={`/profile/${r.userId?.username}`} className="font-black hover:underline">
-                  @{r.userId?.username}
-                </Link>
-                {' drank '}
-                <Link href={`/waters/${r.waterId?.slug}`} className="font-black hover:underline">
-                  {r.waterId?.brand} {r.waterId?.name}
-                </Link>
-                <span className="text-[#e63946] ml-2 text-xs">{starsDisplay(r.score)}</span>
-              </div>
-              {r.review && <p className="text-gray-600 text-xs mt-1 italic">"{r.review}"</p>}
+      {/* Rising bubbles */}
+      {[...Array(18)].map((_, i) => (
+        <span
+          key={i}
+          className="bubble"
+          style={{
+            width:  `${8 + (i * 7) % 22}px`,
+            height: `${8 + (i * 7) % 22}px`,
+            left:   `${(i * 17 + 5) % 95}%`,
+            bottom: '-40px',
+            animationDuration: `${5 + (i * 3) % 7}s`,
+            animationDelay:    `${(i * 1.1) % 6}s`,
+          }}
+        />
+      ))}
+
+      {/* 3D bottle */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
+        <div style={{ width: '480px', height: '600px', maxWidth: '90vw', maxHeight: '65vh' }}>
+          <BottleScene />
+        </div>
+      </div>
+
+      {/* Text + CTA */}
+      <div
+        className="relative flex flex-col items-center text-center px-6"
+        style={{ zIndex: 2, marginTop: '54vh' }}
+      >
+        {visible && (
+          <>
+            <div className="fade-up text-[#e63946] text-xs font-black tracking-[5px] mb-3">
+              TRACK. RATE. HYDRATE.
             </div>
-          ))}
-        </div>
-      </section>
+            <h1
+              className="fade-up-delay text-white font-black tracking-[4px] leading-none mb-8"
+              style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)' }}
+            >
+              WATERBOXD
+            </h1>
+            <Link
+              href="/home"
+              className="fade-up-delay2 inline-block bg-[#e63946] text-white font-black tracking-widest uppercase px-10 py-3 border-3 border-white hover:bg-white hover:text-black transition-colors text-sm"
+            >
+              ENTER →
+            </Link>
+          </>
+        )}
+      </div>
+
     </div>
   )
 }
