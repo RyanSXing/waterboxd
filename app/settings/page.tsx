@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const [bioLoaded, setBioLoaded] = useState(false)
 
   useEffect(() => {
+    if (session === null) { router.push('/sign-in'); return }
     if (session?.user?.name && !bioLoaded) {
       fetch(`/api/users/${session.user.name}`)
         .then(r => r.json())
@@ -21,9 +22,9 @@ export default function SettingsPage() {
           setBioLoaded(true)
         })
     }
-  }, [session, bioLoaded])
+  }, [session, bioLoaded, router])
 
-  if (!session) { router.push('/sign-in'); return null }
+  if (!session) return null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
