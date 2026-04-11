@@ -17,7 +17,7 @@ export default function SignInPage() {
     setError('')
     const res = await signIn('credentials', { email, password, redirect: false })
     if (res?.error) { setError('Invalid email or password'); setLoading(false); return }
-    router.push('/')
+    router.push('/home')
     router.refresh()
   }
 

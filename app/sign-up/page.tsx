@@ -28,7 +28,7 @@ export default function SignUpPage() {
       return
     }
     await signIn('credentials', { email, password, redirect: false })
-    router.push('/')
+    router.push('/home')
     router.refresh()
   }
 
