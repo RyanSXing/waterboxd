@@ -22,7 +22,7 @@ Waterboxd is a platform for browsing a curated gallery of bottled waters — min
 
 ## How we built it
 
-We built Waterboxd with Next.js, React, TypeScript, Tailwind CSS, NextAuth.js, and MongoDB. The site uses the Next.js app router and API routes for server-side data operations, while the landing page features a custom WebGL ripple shader effect for a watery hero experience.
+We built Waterboxd with Next.js, React, TypeScript, Tailwind CSS, NextAuth.js, and MongoDB. The site uses the Next.js app router and API routes for server-side data operations, while the landing page features a custom WebGL ripple shader effect for a watery hero experience. Authentication is handled by NextAuth.js with a Credentials provider, and we used MongoDB with Mongoose for schema modeling including User, Water, Rating, DiaryEntry, and List collections.
 
 ## Challenges we ran into
 
