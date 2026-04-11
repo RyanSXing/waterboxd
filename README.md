@@ -22,7 +22,28 @@ Waterboxd is a platform for browsing a curated gallery of bottled waters — min
 
 ## How we built it
 
-We built Waterboxd with Next.js, React, TypeScript, Tailwind CSS, NextAuth.js, and MongoDB. The site uses the Next.js app router and API routes for server-side data operations, while the landing page features a custom WebGL ripple shader effect for a watery hero experience. Authentication is handled by NextAuth.js with a Credentials provider, and we used MongoDB with Mongoose for schema modeling including User, Water, Rating, DiaryEntry, and List collections.
+### Frontend
+Waterboxd is built on **Next.js 15** using the App Router. Every page is a React Server or Client Component depending on whether it needs interactivity. We used **Tailwind CSS** for styling with a custom brutalist design system — black backgrounds, 3px borders, bold tracking, and a red (`#e63946`) accent color throughout.
+
+### Backend
+All data operations go through **Next.js API routes** (`app/api/`). We have endpoints for waters, ratings, reviews, diary entries, lists, user following, search, and settings. Each route verifies the session before touching the database.
+
+### Database
+We used **MongoDB** with **Mongoose** for schema modeling. The data model includes six collections: `User`, `Water`, `Rating`, `DiaryEntry`, `List`, and a wantlist embedded on the user document. Ratings are denormalized onto the Water document (`avgRating`, `ratingCount`) so the catalog page doesn't need aggregation queries on every load. We wrote a seed script (`scripts/seed.ts`) to populate the catalog with real bottled water brands and images.
+
+### Authentication
+Authentication is handled by **NextAuth.js v5** with a Credentials provider. Users register with email and password (bcrypt-hashed), sign in, and receive a JWT session. The session username is used as the canonical user identifier across the app.
+
+### Landing Page — WebGL Water Shader
+The landing page is the most technically involved part of the project. It runs a real-time **water wave simulation** in WebGL2, ported from a GLSL shader. The simulation uses a **ping-pong framebuffer** technique: two floating-point textures (RGBA32F) alternate each frame as read/write targets. Each frame, a fragment shader propagates a pressure wave equation across every pixel — computing new pressure and velocity values from the four cardinal neighbors, applying damping, and storing the result.
+
+The render pass samples the simulation texture to compute surface normals, applies UV distortion to the background gradient, and adds specular highlights that shimmer as waves pass. The page text ("WATERBOXD") is rendered to an offscreen Canvas 2D context, uploaded as a WebGL texture, and distorted by the same UV offset as the water — so the letters ripple in sync with the surface. Mouse movement continuously emits pressure at the cursor position, making the entire surface interactive.
+
+### Search
+Water search uses a **MongoDB text index** on the `name` and `brand` fields, supporting fast full-text queries across the catalog.
+
+### Rating System
+Ratings use a **half-star scale** (0.5–5.0 in 0.5 increments). When a rating is submitted or deleted, an aggregation pipeline recomputes the water's `avgRating` and `ratingCount` and writes them back atomically. Authentication is handled by NextAuth.js with a Credentials provider, and we used MongoDB with Mongoose for schema modeling including User, Water, Rating, DiaryEntry, and List collections.
 
 ## Challenges we ran into
 
